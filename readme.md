@@ -64,7 +64,7 @@ _Namespaces don't show up in the resulting markup, but the DOM knows they're the
 </div>
 ```
 
-#### HTML + MATHML
+#### HTML + MathML
 
 _MathML does not have a module yet, this syntax could be cleaned up similar to the SVG example_
 
@@ -105,7 +105,7 @@ Not everyone needs SVG support, and if that's you, why download bytes you don't 
 $ cake --basic build
 ```
 
-#### SVG + MATHML
+#### SVG + MathML
 
 _note that `math` is not a real module yet, it's for illustrative purposes only_
 
