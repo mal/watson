@@ -1,4 +1,4 @@
-# It's elementary, my dear  _Watson!_
+# It's elementary, my dear &mdash; _Watson!_
 ---
 
 _Watson_ is a nano framework for quickly building DOM trees; all while keeping you clear of all the typical `createElement`, `setAttribute` and namespace related hassle! It supports the default (usually HTML) and SVG namespaces out of the box, and others can be added very easily at runtime.
@@ -114,7 +114,7 @@ $ cake -i svg -i math build
 ```
 
 # License
-Copyright (C) 2012 Mal Graty <mal.graty@googlemail.com>
+Copyright (C) 2012 Mal Graty &lt;mal.graty@googlemail.com&gt;
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
