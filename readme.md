@@ -69,13 +69,13 @@ _Namespaces don't show up in the resulting markup, but the DOM knows they're the
 _MathML does not have a module yet, this syntax could be cleaned up similar to the SVG example_
 
 ```js
-Watson.__registerNamespace__('mathml', 'http://www.w3.org/1998/Math/MathML');
+Watson.__registerNamespace__('math', 'http://www.w3.org/1998/Math/MathML');
 
 var xml = Watson,
     div = xml.div([
-        xml('mathml:math', [
-            xml('mathml:mrow', [
-                xml('mathml:mi', 'x')
+        xml('math:math', [
+            xml('math:mrow', [
+                xml('math:mi', 'x')
             ])
         ])
     ]);
