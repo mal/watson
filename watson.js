@@ -1,5 +1,5 @@
-!function (doc)
-{
+!function (doc) {
+
     var namespaces = {},
         string = 'string',
 
@@ -42,7 +42,7 @@
         };
     }
 
-   function xml(name, opts, nodes)
+    function xml(name, opts, nodes)
     {
         var el = createElement(doc, name);
 
