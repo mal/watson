@@ -16,13 +16,12 @@
         var args = [];
 
         if ( isArray(key) )
-            args = key;
+            args.push(key.shift());
         else
-        {
             if ( key = key.split(':'), key.length > 1 )
                 args.push(namespaces[key.shift()]);
-            args.push(key.shift());
-        }
+
+        args.push(key.shift());
 
         if ( arguments.length > 1 )
             args.push(value);
@@ -70,7 +69,7 @@
     xml.__registerNamespace__ = function (abbr, url)
     {
         if ( abbr in namespaces )
-            throw abbr + ' namespace already registered as "' + namespaces[abbr] + '"';
+            throw abbr + ' namespace already registered';
         namespaces[abbr] = url;
     }
 
