@@ -1,7 +1,6 @@
 !function (doc) {
 
     var namespaces = {},
-        string = 'string',
 
         arr = Array.prototype,
         isArray = Array.isArray,
@@ -10,6 +9,11 @@
 
         createElement = namespace(doc.__proto__, 'createElement'),
         setAttribute = namespace(Element.prototype, 'setAttribute');
+
+    function isLiteral(value)
+    {
+        return ! ({ object: 1, 'undefined': 1 })[typeof value];
+    }
 
     function parse(key, value)
     {
@@ -45,9 +49,9 @@
     {
         var el = createElement(doc, name);
 
-        if ( isArray(opts) || typeof opts === string )
+        if ( isArray(opts) || isLiteral(opts) )
             nodes = opts, opts = {};
-        if ( typeof nodes === string )
+        if ( isLiteral(nodes) )
             nodes = [nodes];
 
         if ( opts )

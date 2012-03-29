@@ -11,8 +11,8 @@ _Watson_ is a nano framework for quickly building DOM trees; all while keeping y
 var xml = Watson,
     div = xml.div({ 'class': 'box' }, [
         xml.h1('Box Title'),
-        'Box related ',
-        xml.span({ id: 'keyword' }, 'content')
+        'This is box number ',
+        xml.span({ id: 'index' }, 1)
     ]);
 
 document.body.appendChild(div);
@@ -21,8 +21,8 @@ document.body.appendChild(div);
 ```html
 <div class="box">
     <h1>Box Title</h1>
-    Box related
-    <span id="keyword">content</span>
+    This is box number
+    <span id="index">1</span>
 </div>
 ```
 
