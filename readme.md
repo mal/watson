@@ -26,7 +26,7 @@ document.body.appendChild(div);
 </div>
 ```
 
-#### HTML + SVG + XLINK
+#### HTML + SVG + XLink
 
 ```js
 Watson.__registerNamespace__('xlink', 'http://www.w3.org/1999/xlink');
