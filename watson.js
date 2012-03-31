@@ -1,5 +1,7 @@
 !function (doc) {
 
+    "use strict";
+
     var namespaces = {},
 
         arr = Array.prototype,
@@ -83,6 +85,6 @@
         return xml.apply(this, args);
     }
 
-    Watson = xml;
+    window.Watson = xml;
 
 }(document);
