@@ -1,90 +1,115 @@
-!function (doc) {
+!function (window) {
 
     "use strict";
 
-    var namespaces = {},
-
-        arr = Array.prototype,
+    var document = window.document,
         isArray = Array.isArray,
-        slice = arr.slice,
-        unshift = arr.unshift,
+        namespaceURI = 'namespaceURI',
+        nsuri = document.documentElement[namespaceURI],
+        wat = { extend: extend };
 
-        createElement = namespace(doc.__proto__, 'createElement'),
-        setAttribute = namespace(Element.prototype, 'setAttribute');
+    function attribute(element, nsuri, name, value)
+    {
+        var parts;
+        if ( parts = parse(name) )
+            nsuri = parts[0], name = parts[1];
+
+        if ( nsuri === element[namespaceURI] )
+            nsuri = null;
+
+        element.setAttributeNS(nsuri, name, value);
+    }
+
+    function convert(args)
+    {
+        return [].slice.call(args);
+    }
+
+    function element(nsuri, name, attributes, nodes)
+    {
+        var parts;
+        if ( parts = parse(name) )
+            nsuri = parts[0], name = parts[1];
+
+        var element = document.createElementNS(nsuri, name);
+
+        if ( isArray(attributes) || isLiteral(attributes) )
+            nodes = attributes, attributes = {};
+
+        if ( isLiteral(nodes) )
+            nodes = [nodes];
+
+        if ( attributes )
+            for ( var key in attributes )
+                attribute(element, nsuri, key, attributes[key]);
+
+        if ( nodes )
+            for ( var l = nodes.length, i = 0; i < l; i++ )
+                node(element, nodes[i]);
+
+        return element;
+    }
+
+    function extend(nsuri, taglist)
+    {
+        var namespace = nsuri.split('/').pop(),
+            obj = base;
+
+        function augment(proxy, id)
+        {
+            if ( ! base[id] )
+                base[id] = function () {
+                    return element.apply(null, [nsuri, id].concat(convert(arguments)));
+                }
+            return base[id];
+        }
+
+        function base()
+        {
+            return element.apply(null, [nsuri].concat(convert(arguments)));
+        }
+
+        base[namespaceURI] = nsuri;
+
+        if ( window.Proxy )
+            obj = Proxy.createFunction({
+                get: augment,
+                set: function (proxy, id, value) { base[id] = value; }
+            }, base);
+        else
+            if ( isArray(taglist) )
+                for ( var l = taglist.length, i = 0; i < l; i++ )
+                    augment(null, taglist[i]);
+            else
+                document.write('<script src="' + taglist + '"></script>');
+
+        wat[namespace] = obj;
+    }
 
     function isLiteral(value)
     {
         return ! ({ object: 1, 'undefined': 1 })[typeof value];
     }
 
-    function parse(key, value)
+    function node(element, node)
     {
-        var args = [];
-
-        if ( isArray(key) )
-            args.push(key.shift());
-        else
-            if ( key = key.split(':'), key.length > 1 )
-                args.push(namespaces[key.shift()]);
-
-        args.push(key.shift());
-
-        if ( arguments.length > 1 )
-            args.push(value);
-
-        return args;
+        if ( ! ( node instanceof Node ) )
+            node = document.createTextNode(node);
+        element.appendChild(node);
     }
 
-    function namespace(obj, func, limit)
+    function parse(name)
     {
-        return function (el, key, value)
+        if ( ~name.indexOf(':') )
         {
-            var args = parse.apply(null, slice.call(arguments, 1)),
-                method = func;
-            if ( args.length > obj[method].length )
-                method += 'NS';
-            return obj[method].apply(el, args);
-        };
+            var parts = name.split(':');
+            if ( parts[0] in wat )
+                return [wat[parts[0]][namespaceURI], parts[1]];
+        }
+        return false;
     }
 
-    function xml(name, opts, nodes)
-    {
-        var el = createElement(doc, name);
+    wat[namespaceURI] = nsuri;
+    window.Watson = wat;
 
-        if ( isArray(opts) || isLiteral(opts) )
-            nodes = opts, opts = {};
-        if ( isLiteral(nodes) )
-            nodes = [nodes];
-
-        if ( opts )
-            for ( var key in opts )
-                setAttribute(el, key, opts[key]);
-
-        if ( nodes )
-            for ( var l = nodes.length, i = 0; i < l; i++ )
-            {
-                var node = nodes[i];
-                if ( ! ( node instanceof Node ) )
-                    node = doc.createTextNode(node);
-                el.appendChild(node);
-            }
-
-        return el;
-    }
-
-    xml.__registerNamespace__ = function (abbr, url)
-    {
-        if ( abbr in namespaces )
-            throw abbr + ' namespace already registered';
-        namespaces[abbr] = url;
-    }
-
-    xml.__noSuchMethod__ = function (id, args)
-    {
-        unshift.call(args, id);
-        return xml.apply(this, args);
-    }
-
-    window.Watson = xml;
-
-}(document);
+}(window);
