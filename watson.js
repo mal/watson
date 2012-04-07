@@ -8,9 +8,11 @@
         nsuri = document.documentElement[namespaceURI],
         wat = { extend: extend };
 
-    function attribute(element, nsuri, name, value)
+    function attribute(element, name, value)
     {
-        var parts;
+        var nsuri = null,
+            parts;
+
         if ( parts = parse(name) )
             nsuri = parts[0], name = parts[1];
 
@@ -41,7 +43,7 @@
 
         if ( attributes )
             for ( var key in attributes )
-                attribute(element, nsuri, key, attributes[key]);
+                attribute(element, key, attributes[key]);
 
         if ( nodes )
             for ( var l = nodes.length, i = 0; i < l; i++ )
@@ -50,10 +52,12 @@
         return element;
     }
 
-    function extend(nsuri, taglist)
+    function extend(namespace, nsuri, taglist)
     {
-        var namespace = nsuri.split('/').pop(),
-            obj = base;
+        if ( arguments.length < 2 || isArray(nsuri) )
+            taglist = nsuri, nsuri = namespace, namespace = nsuri.split('/').pop();
+
+        var obj = base;
 
         function augment(proxy, id)
         {
@@ -82,6 +86,9 @@
                     augment(null, taglist[i]);
 
         wat[namespace] = obj;
+
+        if ( wat._[namespaceURI] === nsuri )
+            wat._ = obj;
     }
 
     function isLiteral(value)
@@ -107,7 +114,7 @@
         return false;
     }
 
-    wat[namespaceURI] = nsuri;
+    extend('_', nsuri);
     window.Watson = wat;
 
 }(window);
