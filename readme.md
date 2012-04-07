@@ -33,8 +33,7 @@ document.body.appendChild(div);
 _Assumes XHTML and SVG support is baked in._
 
 ```js
-// add support for xlink attributes, no need for a tagList as
-// we're not using Watson.xlink
+// add support for xlink attributes, no need for a tagList as we're not using Watson.xlink
 Watson.extend('http://www.w3.org/1999/xlink');
 
 var xml = Watson.xhtml,
@@ -104,7 +103,7 @@ _Namespaces don't show up in the resulting markup, but the DOM knows they're the
 
 # Custom Builds
 
-Not everyone needs SVG support, and if that's you, why download bytes you don't need? The `Cakefile` provided allows you to customise your version by picking which modules you want to include. **The default is to bake in all modules and minify using uglifyjs (required).**
+Not everyone needs SVG support, and if that's you, why download bytes you don't need? The `Cakefile` provided allows you to customise your version by picking which modules you want to include. **The default is to bake in all modules and minify using UglifyJS (required).**
 
 #### All tags
 
