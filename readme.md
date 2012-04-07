@@ -71,13 +71,13 @@ _Namespaces don't show up in the resulting markup, but the DOM knows they're the
 
 #### HTML + MathML
 
-_MathML isn't given a `tagList` and so uses the long form (`Watson._('m:math', *)` rather than `Watson.m.math(*)`). Short form can used with proxy supporting browsers, but for cross browser compatability a `tagList` must be provided._
+_MathML isn't given a `tagList` and so uses the long form (`Watson.xml('m:math', ...)` rather than `Watson.m.math(...)`). Short form can used with proxy supporting browsers, but for cross browser compatability a `tagList` must be provided._
 
 ```js
 Watson.extend('m', 'http://www.w3.org/1998/Math/MathML');
 
-// Assuming we're working in a HTML5 doc; Watson._ is a shortcut to Watson.xhtml
-var xml = Watson._,
+// assuming we're working in a HTML5 doc; Watson.xml is a shortcut to Watson.xhtml
+var xml = Watson.xml,
     div = xml.div([
         xml('m:math', [
             xml('m:mrow', [
@@ -129,7 +129,7 @@ $ cake --tags svg --tags math build
 
 # API
 
-##### Watson._
+##### Watson.xml
 
 The out of the box namespace support using the `namespaceURI` of the current document. _See the "HTML + MathML" example for usage._
 

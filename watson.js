@@ -5,7 +5,7 @@
     var document = window.document,
         isArray = Array.isArray,
         namespaceURI = 'namespaceURI',
-        nsuri = document.documentElement[namespaceURI],
+        docuri = document.documentElement[namespaceURI],
         wat = { extend: extend };
 
     function attribute(element, name, value)
@@ -87,8 +87,8 @@
 
         wat[namespace] = obj;
 
-        if ( wat._[namespaceURI] === nsuri )
-            wat._ = obj;
+        if ( docuri === nsuri )
+            wat.xml = obj;
     }
 
     function isLiteral(value)
@@ -114,7 +114,7 @@
         return false;
     }
 
-    extend('_', nsuri);
+    extend(docuri);
     window.Watson = wat;
 
 }(window);
