@@ -80,8 +80,6 @@
             if ( isArray(taglist) )
                 for ( var l = taglist.length, i = 0; i < l; i++ )
                     augment(null, taglist[i]);
-            else
-                document.write('<script src="' + taglist + '"></script>');
 
         wat[namespace] = obj;
     }

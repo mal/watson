@@ -25,36 +25,41 @@ task 'bake', (opts) ->
 
     invoke 'clean'
 
+    defs = ''
     libs = ''
 
     if not opts.basic?
         if opts.include?
+            defs = ' ' + opts.include.map(tags).join ' '
             libs = opts.include.map(
                 (lib) -> "lib/#{lib}.js"
             ).join(' ')
         else
             libs = 'lib/*.js'
 
-    libs = "cat #{project}.js #{libs} | "
     out = project + '.build.js'
-
-    cp.exec 'mkdir -p build/lib'
+    pipe = "cat #{project}.js #{libs}"
 
     if not opts['no-minify']
         out = project + '.min.js'
-        pipe = minify
+        pipe += ' | ' + minify
     else
-        pipe = build
+        pipe += ' | ' + build
 
-    fs.readdir 'lib', (err, files) ->
-        if not err
-            files = files.filter (file) -> /\.js/.test file
-            pipe += ' ' + files.map(tags).join ' '
-            cp.exec libs + pipe + ' > build/' + out, done
-            files.forEach (file) -> cp.exec "cat lib/#{file} | " + pipe + " > build/lib/#{file}", done
-        else
-            done err
+    sink = ' > ' + out
+
+    if not opts.basic? and not opts.include?
+        fs.readdir 'lib', (err, files) ->
+            if not err
+                defs = ' ' + files.filter(
+                    (file) -> /\.txt/.test file
+                ).map(tags).join ' '
+                cp.exec pipe + defs + sink, done
+            else
+                done err
+    else
+        cp.exec pipe + defs + sink, done
 
 task 'clean', ->
-    cp.exec 'rm -r build', done
+    cp.exec 'rm -f *.build.js *.min.js', done
 
