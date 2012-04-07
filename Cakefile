@@ -1,58 +1,55 @@
 cp = require 'child_process'
-#cp = { exec: console.log }
 fs = require 'fs'
 
 project = 'watson'
-build = 'uglifyjs -b -ns'
+library = 'tags'
 minify = 'uglifyjs -c -mt --no-dead-code --unsafe --lift-vars'
 
-done = (err) ->
+done = (err, stdout, stderr) ->
     if err
-        console.log "\033[1;30m >\033[1;31m Remember that you need: uglifyjs installed\033[m"
-        console.log err.stack
+        console.log "\033[1;30m >\033[0;31m task failed\033[m"
+        if stderr
+            echo stderr
     else
-        console.log "\033[1;30m >\033[1;32m Task complete\033[m"
+        if stdout
+            echo stdout, '0;32'
 
-tags = (lib) ->
-    lib = lib.split('.').shift()
-    "--define TAGS_#{lib.toUpperCase()}=\"$(cat lib/#{lib}.txt | tr \"\n\" ,)\""
+echo = (text, colour) ->
+    colour ?= '1;30'
+    text.trim().split('\n').forEach (line) ->
+        console.log "\033[1;30m >\033[#{colour}m #{line}\033[m"
 
-option '-b', '--basic'
-option '-i', '--include [module*]'
-option '-n', '--no-minify'
+tags = (ns) ->
+    ns = ns.split('.').shift()
+    "--define TAGS_#{ns.toUpperCase()}=\"$(cat #{library}/#{ns}.txt | tr \"\n\" ,)\""
 
-task 'bake', (opts) ->
+option '-n', '--no-tags', 'build without taglists; will require proxy support in browser'
+option '-t', '--tags [module*]', 'build with these taglists only'
+
+task 'build', 'compile and minify watson', (opts) ->
 
     invoke 'clean'
 
     defs = ''
     libs = ''
 
-    if not opts.basic?
-        if opts.include?
-            defs = ' ' + opts.include.map(tags).join ' '
-            libs = opts.include.map(
-                (lib) -> "lib/#{lib}.js"
+    if 'no-tags' not of opts
+        if 'tags' of opts
+            defs = ' ' + opts.tags.map(tags).join ' '
+            libs = opts.tags.map(
+                (lib) -> library + "/#{lib}.js"
             ).join(' ')
         else
-            libs = 'lib/*.js'
+            libs = library + '/*.js'
 
-    out = project + '.build.js'
-    pipe = "cat #{project}.js #{libs}"
+    pipe = "cat #{project}.js #{libs} | #{minify}"
+    sink = " > #{project}.min.js && echo built successfully"
 
-    if not opts['no-minify']
-        out = project + '.min.js'
-        pipe += ' | ' + minify
-    else
-        pipe += ' | ' + build
-
-    sink = ' > ' + out
-
-    if not opts.basic? and not opts.include?
-        fs.readdir 'lib', (err, files) ->
+    if 'no-tags' not of opts and 'tags' not of opts
+        fs.readdir 'tags', (err, files) ->
             if not err
                 defs = ' ' + files.filter(
-                    (file) -> /\.txt/.test file
+                    (file) -> /\.txt$/.test file
                 ).map(tags).join ' '
                 cp.exec pipe + defs + sink, done
             else
@@ -60,6 +57,6 @@ task 'bake', (opts) ->
     else
         cp.exec pipe + defs + sink, done
 
-task 'clean', ->
-    cp.exec 'rm -f *.build.js *.min.js', done
+task 'clean', 'remove any files created by the build task', ->
+    cp.exec "rm -fv #{project}.min.js", done
 

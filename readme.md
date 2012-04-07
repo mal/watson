@@ -1,14 +1,16 @@
 # It's elementary, my dear &mdash; _Watson!_
 ---
 
-_Watson_ is a nano framework for quickly building DOM trees; all while keeping you clear of all the typical `createElement`, `setAttribute` and namespace related hassle! It supports the default (usually HTML) and SVG namespaces out of the box, and others can be added very easily at runtime.
+_Watson_ is an extensible nano framework for quickly building DOM trees; all while keeping you clear of all the typical `createElement`, `setAttribute` and namespace related hassle! It supports the default (HTML5) out of the box, and others can be added very easily at runtime.
 
 # Examples
 
 #### HTML
 
+_Assumes XHTML support is baked in. **HTML5 uses the XHTML namespace.**_
+
 ```js
-var xml = Watson,
+var xml = Watson.xhtml,
     div = xml.div({ 'class': 'box' }, [
         xml.h1('Box Title'),
         'This is box number ',
@@ -28,13 +30,17 @@ document.body.appendChild(div);
 
 #### HTML + SVG + XLink
 
-```js
-Watson.__registerNamespace__('xlink', 'http://www.w3.org/1999/xlink');
+_Assumes XHTML and SVG support is baked in._
 
-var xml = Watson,
-    svg = xml.svg,
+```js
+// add support for xlink attributes, no need for a tagList as
+// we're not using Watson.xlink
+Watson.extend('http://www.w3.org/1999/xlink');
+
+var xml = Watson.xhtml,
+    svg = Watson.svg,
     div = xml.div({ 'class': 'container' }, [
-        svg({ version: 1.1, width: 300, height: 300 }, [
+        svg.svg({ version: 1.1, width: 300, height: 300 }, [
             svg.desc('This graphic links to an external image'),
             svg.image({
                 x: 50,
@@ -51,7 +57,7 @@ var xml = Watson,
 document.body.appendChild(div);
 ```
 
-_Namespaces don't show up in the resulting markup, but the DOM knows they're there_
+_Namespaces don't show up in the resulting markup, but the DOM knows they're there._
 
 ```html
 <div class="container">
@@ -66,16 +72,17 @@ _Namespaces don't show up in the resulting markup, but the DOM knows they're the
 
 #### HTML + MathML
 
-_MathML does not have a module yet, this syntax could be cleaned up similar to the SVG example_
+_MathML isn't given a `tagList` and so uses the long form (`Watson._('m:math', *)` rather than `Watson.m.math(*)`). Short form can used with proxy supporting browsers, but for cross browser compatability a `tagList` must be provided._
 
 ```js
-Watson.__registerNamespace__('math', 'http://www.w3.org/1998/Math/MathML');
+Watson.extend('m', 'http://www.w3.org/1998/Math/MathML');
 
-var xml = Watson,
+// Assuming we're working in a HTML5 doc; Watson._ is a shortcut to Watson.xhtml
+var xml = Watson._,
     div = xml.div([
-        xml('math:math', [
-            xml('math:mrow', [
-                xml('math:mi', 'x')
+        xml('m:math', [
+            xml('m:mrow', [
+                xml('m:mi', 'x')
             ])
         ])
     ]);
@@ -83,7 +90,7 @@ var xml = Watson,
 document.body.appendChild(div);
 ```
 
-_Namespaces don't show up in the resulting markup, but the DOM knows they're there_
+_Namespaces don't show up in the resulting markup, but the DOM knows they're there._
 
 ```html
 <div>
@@ -99,10 +106,18 @@ _Namespaces don't show up in the resulting markup, but the DOM knows they're the
 
 Not everyone needs SVG support, and if that's you, why download bytes you don't need? The `Cakefile` provided allows you to customise your version by picking which modules you want to include. **The default is to bake in all modules and minify using uglifyjs (required).**
 
-#### HTML only
+#### All tags
+
+_bakes in all available namespaces_
 
 ```sh
-$ cake --basic build
+$ cake build
+```
+
+#### Proxy support only
+
+```sh
+$ cake --no-tags build
 ```
 
 #### SVG + MathML
@@ -110,10 +125,27 @@ $ cake --basic build
 _note that `math` is not a real module yet, it's for illustrative purposes only_
 
 ```sh
-$ cake -i svg -i math build
+$ cake --tags svg --tags math build
 ```
 
+# API
+
+##### Watson._
+
+The out of the box namespace support using the `namespaceURI` of the current document. _See the "HTML + MathML" example for usage._
+
+##### Watson.extend([nsID,] nsURI [, tagList])
+
+The `extend` function is used to add support for additional namespaces; accessed by `Watson.<nsID>`. If no `nsID` is supplied _Watson_ will infer it from the `nsURI`. i.e. `http://www.w3.org/1999/xlink` will get the `nsID` of `xlink`.
+
+In addition a `tagList` is required to support browsers that **do not** implement [Harmony Proxies](http://wiki.ecmascript.org/doku.php?id=harmony:proxies). At present the only browsers with proxy support are Firefox and Chrome (with the experimental JavaScript flag set).
+
+# Future
+
+Once [Direct Proxies](http://wiki.ecmascript.org/doku.php?id=harmony:direct_proxies) (or Harmony Proxies) are widely supported `tagLists` can be dropped reducing the library size.
+
 # License
+
 Copyright (C) 2012 Mal Graty &lt;mal.graty@googlemail.com&gt;
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
