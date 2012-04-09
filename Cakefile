@@ -3,7 +3,7 @@ fs = require 'fs'
 
 project = 'watson'
 library = 'tags'
-minify = 'uglifyjs -c -mt --no-dead-code --unsafe --lift-vars'
+minify = 'uglifyjs -mt --unsafe'
 
 done = (err, stdout, stderr) ->
     if err

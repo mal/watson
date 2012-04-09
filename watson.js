@@ -4,8 +4,7 @@
 
     var document = window.document,
         isArray = Array.isArray,
-        namespaceURI = 'namespaceURI',
-        docuri = document.documentElement[namespaceURI],
+        docuri = document.documentElement.namespaceURI,
         wat = { extend: extend };
 
     function attribute(element, name, value)
@@ -16,7 +15,7 @@
         if ( parts = parse(name) )
             nsuri = parts[0], name = parts[1];
 
-        if ( nsuri === element[namespaceURI] )
+        if ( nsuri === element.namespaceURI )
             nsuri = null;
 
         element.setAttributeNS(nsuri, name, value);
@@ -73,7 +72,7 @@
             return element.apply(null, [nsuri].concat(convert(arguments)));
         }
 
-        base[namespaceURI] = nsuri;
+        base.namespaceURI = nsuri;
 
         if ( window.Proxy )
             obj = Proxy.createFunction({
@@ -109,7 +108,7 @@
         {
             var parts = name.split(':');
             if ( parts[0] in wat )
-                return [wat[parts[0]][namespaceURI], parts[1]];
+                return [wat[parts[0]].namespaceURI, parts[1]];
         }
         return false;
     }
